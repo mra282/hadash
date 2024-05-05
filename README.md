@@ -1,6 +1,8 @@
 # Next.js Dashboard
 
-This is a dashboard built with Next.js, Tailwind CSS, and TypeScript. It displays various widgets, including a light widget, temperature widget, forecast widget, and clock widget. The widgets are organized in a grid layout with a maximum of 5 columns. Widgets can span multiple columns and rows, and they automatically move to the next row if there are more widgets than columns.
+This is a dashboard built with Next.js, Tailwind CSS, and TypeScript. It displays various widgets, currently a light widget, temperature widget, forecast widget, and clock widget. The widgets are organized in a grid layout with a maximum of 5 columns. Widgets can span multiple columns and rows, and they automatically move to the next row if there are more widgets than columns. Feel free to point out issues and/or expand the functionality. 
+
+![Dashboard Screenshot](images/screenshot.png)
 
 ## Docker Images
 
