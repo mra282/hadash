@@ -25,7 +25,7 @@ docker pull mra2414/nextjs-hadash:latest-arm64
 To run the dashboard, you can use the following command:
 
 ```bash
-docker run -p 3000:3000 mra2414/nextjs-hadash:latest
+docker run -e NEXT_PUBLIC_HASS_URL='your_hass_url' -e NEXT_PUBLIC_HASS_TOKEN='your_hass_token' -p 3000:3000 mra2414/nextjs-hadash:latest
 ```
 
 Then, open your web browser and navigate to http://localhost:3000.
