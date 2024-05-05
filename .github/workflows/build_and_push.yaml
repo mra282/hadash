@@ -37,5 +37,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/nestjs-hadash-arm:${{ steps.get_version.outputs.VERSION }}, ${{ secrets.DOCKER_HUB_USERNAME }}/nestjs-hadash:latest-arm64
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/nestjs-hadash:${{ steps.get_version.outputs.VERSION }}-arm64, ${{ secrets.DOCKER_HUB_USERNAME }}/nestjs-hadash:latest-arm64
           platforms: linux/arm64
