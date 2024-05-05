@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Dashboard
 
-## Getting Started
+This is a dashboard built with Next.js, Tailwind CSS, and TypeScript. It displays various widgets, including a light widget, temperature widget, forecast widget, and clock widget. The widgets are organized in a grid layout with a maximum of 5 columns. Widgets can span multiple columns and rows, and they automatically move to the next row if there are more widgets than columns.
 
-First, run the development server:
+## Docker Images
+
+The Docker images for this dashboard are available on Docker Hub:
+
+- For amd64: `mra2414/nextjs-hadash:latest`
+- For arm64: `mra2414/nextjs-hadash:latest-arm64`
+
+You can pull the Docker images with the following commands:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# For amd64
+docker pull mra2414/nextjs-hadash:latest
+
+# For arm64
+docker pull mra2414/nextjs-hadash:latest-arm64
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running the Dashboard
+To run the dashboard, you can use the following command:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker run -p 3000:3000 mra2414/nextjs-hadash:latest
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Then, open your web browser and navigate to http://localhost:3000.
 
-## Learn More
+## Customizing the Dashboard
 
-To learn more about Next.js, take a look at the following resources:
+The dashboard is customizable. You can change the tabs and the entities displayed on each tab by modifying the `tabs.ts` file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The `tabs.ts` file contains an array of tab objects. Each tab object has a `name` property, which is the name of the tab, and an `entities` property, which is an array of entity objects. Each entity object represents a widget on the tab.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Here's an example of a tab object:
 
-## Deploy on Vercel
+```typescript
+{
+    name: 'Living Room',
+    entities: [
+        {widgetType: 'ClockWidget', col: 2, row: 2, colOffset: 0, rowOffset: 0},
+        {entityId: 'weather.home', widgetType: 'ForecastWidget', col: 2, row: 2, colOffset: -2, rowOffset: 2},
+        {entityId: 'sensor.living_room_temperature', widgetType: 'TemperatureWidget', col: 1, row: 1, colOffset: 0, rowOffset: 0},
+        {entityId: 'light.table_lamp_door', widgetType: 'LightWidget', col: 1, row: 1, colOffset: 0, rowOffset: 0},
+        {entityId: 'light.sconce', widgetType: 'LightWidget', col: 1, row: 1, colOffset: 0, rowOffset: 0},
+    ],
+}
+```
+In this example, the Living Room tab has a clock widget, a forecast widget, a temperature widget, and two light widgets.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To add a new tab, add a new object to the tabs array. To add a new widget to a tab, add a new object to the entities array of the tab.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Each entity object has the following properties:
+
+widgetType: The type of the widget. This can be 'ClockWidget', 'ForecastWidget', 'TemperatureWidget', or 'LightWidget'.
+col and row: The number of columns and rows the widget spans.
+colOffset and rowOffset: The number of columns and rows the widget is offset from the top-left corner of the tab.
+entityId (optional): The ID of the entity the widget is associated with. This is required for 'ForecastWidget', 'TemperatureWidget', and 'LightWidget'.
+You can modify these properties to customize the layout and content of your dashboard.

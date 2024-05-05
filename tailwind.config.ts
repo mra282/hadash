@@ -13,6 +13,15 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        "light-gray": "#303640",
+        seconds: "rgba(6, 252, 63, 1)",
+        minutes: "rgba(252, 230, 0, 1)",
+        hours: "rgba(253, 41, 112, 1)",
+      },
+      fontFamily: {
+        body: ["Ubuntu", "sans-serif"],
+      },
     },
   },
   plugins: [],

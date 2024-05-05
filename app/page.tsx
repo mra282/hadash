@@ -1,113 +1,98 @@
-import Image from "next/image";
+'use client';
+import React, { useEffect, useState } from 'react';
+import Icon from '@mdi/react';
+import * as mdi from '@mdi/js';
+import LightWidget, { lightEntity } from './widgets/LightWidget';
+import TemperatureWidget from './widgets/TemperatureWidget';
+import { ClockWidget } from './widgets/ClockWidget';
+import { WeatherHomeEntity, ForecastWidget } from './widgets/ForecastWidget';
+import { useHomeAssistantConnection } from './services/homeassistant';
+import { callService } from 'home-assistant-js-websocket';
+import { tabs } from './dashboard/tabs';
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+const Dashboard: React.FC = () => {
+  const { connection, entities } = useHomeAssistantConnection();
+
+  useEffect(() => {
+    document.body.style.backgroundImage = `url('/backgrounds/clear.png')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat'; // Prevent repeating
+    document.body.style.height = '100vh'; // Fill the screen
+  }, []);
+
+  
+  const lightEntities = Object.keys(entities).filter((key) => key.startsWith('light.'));
+    
+  const toggleLight = async (entityId: string) => {
+    if (connection) {
+      await callService(connection, 'homeassistant', 'toggle', { entity_id: entityId });
+    }
+  };
+
+  const setBrightness = async (entityId: string, brightness: number) => {
+    if (connection) {
+      await callService(connection, 'light', 'turn_on', { entity_id: entityId, brightness });
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState(tabs[0].name);
+
+return (
+  <div>
+    <div className="flex space-x-4">
+      {tabs.map((tab) => (
+        <button
+          key={tab.name}
+          className={`py-2 px-4 font-bold ${activeTab === tab.name ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}
+          onClick={() => setActiveTab(tab.name)}
+        >
+          {tab.name}
+        </button>
+      ))}
+    </div>
+
+    <div className="grid grid-cols-5 gap-4 p-6 bg-slate-500/60 backdrop-blur my-5 mx-6">
+  {tabs.find((tab) => tab.name === activeTab)?.entities.map(({ entityId, widgetType, col = 1, row = 1 }) => {
+    const entity = entityId ? entities[entityId] : null;
+
+    let widget;
+    switch (widgetType) {
+      case 'LightWidget':
+        widget = entity && <LightWidget key={entityId} entity={entity as lightEntity} toggleLight={toggleLight} setBrightness={setBrightness}/>;
+        break;
+      case 'TemperatureWidget':
+        widget = entity && <TemperatureWidget key={entityId} entity={entity} />;
+        break;
+      case 'ForecastWidget':
+        if (entity && 'forecast' in entity.attributes && 'temperature_unit' in entity.attributes && 'wind_speed_unit' in entity.attributes) {
+          widget = <ForecastWidget key={entityId} entity={entity as WeatherHomeEntity} />;
+        } else {
+          console.error('Entity does not have necessary properties for WeatherHomeEntity');
+        }
+        break;
+      case 'ClockWidget':
+        widget = <ClockWidget key={entityId} />;
+        break;
+      default:
+        widget = null;
+    }
+
+    if (!widget) return null;
+
+    return (
+      <div key={entityId} className="aspect-[2/1] overflow-clip" style={{ gridColumn: `span ${col}`, gridRow: `span ${row}`, position: 'relative' }}>
+        <div className="rounded shadow">
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+            {widget}
+          </div>
         </div>
       </div>
+    );
+  })}
+</div>
+  </div>
+);
+};
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
-}
+export default Dashboard;
