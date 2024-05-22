@@ -1,16 +1,15 @@
-'use client';
 import React, { useEffect, useState } from 'react';
-import Icon from '@mdi/react';
-import * as mdi from '@mdi/js';
-import LightWidget, { lightEntity } from './widgets/LightWidget';
-import TemperatureWidget from './widgets/TemperatureWidget';
-import { ClockWidget } from './widgets/ClockWidget';
-import { WeatherHomeEntity, ForecastWidget } from './widgets/ForecastWidget';
-import { useHomeAssistantConnection } from './services/homeassistant';
+import Layout from '@/app/layout';
+import LightWidget from '@/widgets/lightWidget/widget';
+import { lightEntity } from '@/widgets/lightWidget/types';
+import { TemperatureWidget } from '@/widgets/temperatureWidget/widget';
+import { ClockWidget } from '@/widgets/clockWidget/widget';
+import { WeatherHomeEntity, ForecastWidget } from '@/widgets/forecastWidget/widget';
+import { useHomeAssistantConnection } from '@/services/homeassistant';
 import { callService } from 'home-assistant-js-websocket';
-import { tabs } from './dashboard/tabs';
+import tabs from '@/dashboards/homeassistant.json';
 
-const Dashboard: React.FC = () => {
+const IndexPage: React.FC = () => {
   const { connection, entities } = useHomeAssistantConnection();
 
   useEffect(() => {
@@ -20,9 +19,6 @@ const Dashboard: React.FC = () => {
     document.body.style.backgroundRepeat = 'no-repeat'; // Prevent repeating
     document.body.style.height = '100vh'; // Fill the screen
   }, []);
-
-  
-  const lightEntities = Object.keys(entities).filter((key) => key.startsWith('light.'));
     
   const toggleLight = async (entityId: string) => {
     if (connection) {
@@ -36,9 +32,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const [activeTab, setActiveTab] = useState(tabs[0].name);
+const [activeTab, setActiveTab] = useState(tabs[0].name);
 
 return (
+  <Layout>
   <div>
     <div className="flex space-x-4">
       {tabs.map((tab) => (
@@ -59,26 +56,26 @@ return (
     let widget;
     switch (widgetType) {
       case 'LightWidget':
-        widget = entity && <LightWidget key={entityId} entity={entity as lightEntity} toggleLight={toggleLight} setBrightness={setBrightness}/>;
+        widget = entity && <LightWidget entity={entity as lightEntity} toggleLight={toggleLight} setBrightness={setBrightness}/>;
         break;
       case 'TemperatureWidget':
-        widget = entity && <TemperatureWidget key={entityId} entity={entity} />;
+        widget = entity && <TemperatureWidget entity={entity} />;
         break;
       case 'ForecastWidget':
         if (entity && 'forecast' in entity.attributes && 'temperature_unit' in entity.attributes && 'wind_speed_unit' in entity.attributes) {
-          widget = <ForecastWidget key={entityId} entity={entity as WeatherHomeEntity} />;
+          widget = <ForecastWidget entity={entity as WeatherHomeEntity} />;
         } else {
           console.error('Entity does not have necessary properties for WeatherHomeEntity');
         }
         break;
       case 'ClockWidget':
-        widget = <ClockWidget key={entityId} />;
+        widget = <ClockWidget />;
         break;
       default:
         widget = null;
     }
 
-    if (!widget) return null;
+    if (!widget) return <React.Fragment key={entityId} />;
 
     return (
       <div key={entityId} className="aspect-[2/1] overflow-clip" style={{ gridColumn: `span ${col}`, gridRow: `span ${row}`, position: 'relative' }}>
@@ -92,7 +89,8 @@ return (
   })}
 </div>
   </div>
+  </Layout>
 );
 };
 
-export default Dashboard;
+export default IndexPage;

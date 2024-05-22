@@ -9,7 +9,7 @@ const getBackgroundColor = (temp: number) => {
   return 'bg-orange-500';
 };
 
-const TemperatureWidget = ({ entity }: { entity: any }) => {
+export const TemperatureWidget = ({ entity }: { entity: any }) => {
   const temp = parseFloat(entity.state);
   const backgroundColor = getBackgroundColor(temp);
 

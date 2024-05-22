@@ -29,13 +29,7 @@ export const ForecastWidget = ({ entity }: {entity: WeatherHomeEntity}) => {
         <p className="text-xs">{dayjs(today.datetime).format('dddd, MMMM D, YYYY')}</p>
       </div>
       <div className="flex justify-between items-start">
-        <Image 
-          src={`/images/icons/weather/${today.condition}.png`} 
-          alt={today.condition} 
-          width={96} // Add width
-          height={96} // Add height
-          className="w-24 h-24 m-auto" 
-        />
+        <Image src={`/images/icons/weather/${today.condition}.png`} alt={today.condition} className="w-24 h-24 m-auto" width={96} height={96} />
         <ul className="text-right text-sm">
           <li>Temperature: {today.temperature}°{entity.attributes.temperature_unit}</li>
           <li>Humidity: {today.humidity}%</li>
@@ -47,13 +41,7 @@ export const ForecastWidget = ({ entity }: {entity: WeatherHomeEntity}) => {
           {forecast.map((data, index) => (
             <div key={index} className="flex flex-col items-center py-2">
               <p>{dayjs(data.datetime).format('MM/DD')}</p>
-              <Image 
-                src={`/images/icons/weather/${data.condition}.png`} 
-                alt={data.condition} 
-                width={24} // Add width
-                height={24} // Add height
-                className="w-6 h-6" 
-              />
+              <Image src={`/images/icons/weather/${data.condition}.png`} alt={data.condition} className="w-6 h-6" width={24} height={24} />
               <p>{data.templow}°/{data.temperature}°</p>
             </div>
           ))}
